@@ -9,6 +9,7 @@ HASH_DB="$BACKUP_DIR/backup_hashes.txt"
 
 mkdir -p $BACKUP_DIR
 
+# Initialize the hash database if it doesn't exist
 if [ ! -f $HASH_DB ]; then
     touch $HASH_DB
 fi
@@ -30,10 +31,12 @@ while read -r HASH FILE; do
     fi
 done < /tmp/file_hashes.txt
 
+# Only create a tar.gz archive if there are modified files
 if $MODIFIED; then
     tar -Pczf $BACKUP_FILE --listed-incremental=$SNAPSHOT_FILE --exclude="$BACKUP_DIR" $SOURCE_DIR --warning=no-file-changed
-    git add "$BACKUP_FILE"
+    git add "$BACKUP_FILE"  # Add the backup archive to Git
 
+    # Commit changes if there are any
     if [ -n "$(git status --porcelain)" ]; then
         git commit -m "Incremental backup on $TIMESTAMP"
         echo "Incremental backup successful and committed to Git."

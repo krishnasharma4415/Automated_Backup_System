@@ -8,10 +8,12 @@ HASH_DB="$BACKUP_DIR/backup_hashes.txt"
 
 mkdir -p $BACKUP_DIR
 
+# Initialize the hash database if it doesn't exist
 if [ ! -f $HASH_DB ]; then
     touch $HASH_DB
 fi
 
+# Generate file hashes and back up only new/modified files
 find $SOURCE_DIR -type f -exec sha256sum {} \; > /tmp/file_hashes.txt
 
 MODIFIED=false
@@ -25,10 +27,12 @@ while read -r HASH FILE; do
     fi
 done < /tmp/file_hashes.txt
 
+# Only create a tar.gz archive if there are modified files
 if $MODIFIED; then
     tar -Pczf $BACKUP_FILE --exclude="$BACKUP_DIR" $SOURCE_DIR --warning=no-file-changed
-    git add "$BACKUP_FILE"
+    git add "$BACKUP_FILE"  # Add the backup archive to Git
 
+    # Commit changes if there are any
     if [ -n "$(git status --porcelain)" ]; then
         git commit -m "Full backup on $TIMESTAMP"
         echo "Full backup successful and committed to Git: $BACKUP_FILE"

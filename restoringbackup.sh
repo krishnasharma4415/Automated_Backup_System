@@ -5,10 +5,12 @@ RESTORE_DIR="/home/krishna/restore"
 
 mkdir -p $RESTORE_DIR
 
+# Restore the latest full backup from Git
 LATEST_FULL_BACKUP=$(ls -t $BACKUP_DIR/full_backup_*.tar.gz | head -n 1)
 git checkout HEAD -- "$LATEST_FULL_BACKUP"
 tar -xzf "$LATEST_FULL_BACKUP" -C $RESTORE_DIR
 
+# Restore incremental backups, if any
 for INCREMENTAL in $(ls $BACKUP_DIR/incremental_backup*.tar.gz | sort); do
     git checkout HEAD -- "$INCREMENTAL"
     tar -xzf "$INCREMENTAL" -C $RESTORE_DIR --warning=no-file-changed
