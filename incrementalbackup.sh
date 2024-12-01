@@ -9,6 +9,9 @@ HASH_DB="$BACKUP_DIR/backup_hashes.txt"
 
 mkdir -p $BACKUP_DIR
 
+# Remove previous incremental backup files
+find $BACKUP_DIR -type f -name "incremental_backup_*.tar.gz" -exec rm -f {} \;
+
 # Initialize the hash database if it doesn't exist
 if [ ! -f $HASH_DB ]; then
     touch $HASH_DB
